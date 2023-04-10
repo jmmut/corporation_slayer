@@ -3,8 +3,7 @@ mod screen;
 mod world;
 
 use crate::screen::commands::get_commands;
-use crate::world::{generate_obstacles, World};
-use macroquad::miniquad::date::now;
+use crate::world::World;
 use macroquad::prelude::*;
 use screen::draw;
 
@@ -21,7 +20,7 @@ async fn main() {
             break;
         }
         world.update(commands);
-        let should_restart = draw::draw(&mut world);
+        draw::draw(&mut world);
         next_frame().await
     }
 }

@@ -1,5 +1,4 @@
 use crate::world::{World, PLAYER_HEIGHT};
-use macroquad::miniquad::date::now;
 use macroquad::models::Vertex;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
