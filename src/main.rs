@@ -41,6 +41,7 @@ fn initialize() -> World {
         jump_started: 0.0,
         obstacles: generate_obstacles(),
         previous_frame_ts: now(),
+        colliding: false,
     };
 
     world

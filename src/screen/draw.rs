@@ -1,4 +1,4 @@
-use crate::world::World;
+use crate::world::{PLAYER_HEIGHT, World};
 use macroquad::prelude::*;
 
 pub fn draw(world: &World) {
@@ -15,7 +15,8 @@ pub fn draw(world: &World) {
 }
 
 fn draw_player(world: &World) {
-    draw_cube_from_floor(world.player_pos, Vec3::new(1.0, 1.75, 1.0), None, BLUE);
+    let color = if world.colliding { RED } else {BLUE};
+    draw_cube_from_floor(world.player_pos, Vec3::new(1.0, PLAYER_HEIGHT, 1.0), None, color);
 }
 
 pub fn draw_cube_from_floor(
@@ -24,17 +25,13 @@ pub fn draw_cube_from_floor(
     texture: impl Into<Option<Texture2D>>,
     color: Color,
 ) {
-    draw_cube(
-        floor_position + Vec3::new(0.0, size.y / 2.0, 0.0),
-        size,
-        texture,
-        color,
-    );
+    let offset = Vec3::new(0.0, size.y / 2.0, 0.0);
+    draw_cube(floor_position + offset, size, texture, color);
 }
 
 pub fn draw_obstacles(obstacles: &Vec<Vec3>) {
     let size = Vec3::new(0.8, 0.5, 0.8);
     for obstacle in obstacles {
-        draw_cube_from_floor(*obstacle, size, None, RED);
+        draw_cube_from_floor(*obstacle, size, None, ORANGE);
     }
 }

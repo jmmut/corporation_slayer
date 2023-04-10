@@ -7,18 +7,21 @@ use macroquad::prelude::*;
 const SPEED: f32 = 10.0;
 const TUNNEL_HALF_WIDTH: f32 = 1.5;
 const JUMP_DURATION: f64 = 0.3;
+pub const PLAYER_HEIGHT: f32 = 1.75;
 
 pub struct World {
     pub player_pos: Vec3,
     pub jump_started: TimestampSeconds,
     pub obstacles: Vec<Vec3>,
     pub previous_frame_ts: TimestampSeconds,
+    pub colliding: bool,
 }
 
 impl World {
     pub fn update(&mut self, commands: Commands) {
         self.update_side_movement(&commands);
         self.update_jumped(&commands);
+        self.update_collision();
         self.update_time(&commands);
     }
 
@@ -61,6 +64,16 @@ impl World {
             self.player_pos.y = 0.0
         }
     }
+    fn update_collision(&mut self) {
+        for obstacle in &self.obstacles {
+            if collides(self.player_pos,*obstacle) {
+                self.colliding = true;
+                return;
+            }
+        }
+        self.colliding = false;
+    }
+
     fn update_time(&mut self, commands: &Commands) {
         self.previous_frame_ts = commands.ts_now;
     }
@@ -84,4 +97,16 @@ pub fn generate_obstacles() -> Vec<Vec3> {
         }
         depth += 1.0;
     }
+}
+
+fn collides(player_pos: Vec3, obstacle_pos: Vec3) -> bool {
+    let obstacle_radius = 0.4;
+    let player_radius = 0.5;
+    let dx = player_pos.x - obstacle_pos.x;
+    let dy = player_pos.y - obstacle_pos.y;
+    let dz = player_pos.z - obstacle_pos.z;
+    let squared_distance = dx*dx + dy*dy + dz*dz;
+    let radius = obstacle_radius + player_radius;
+    let squared_min_distance = radius*radius;
+    squared_distance < squared_min_distance
 }
