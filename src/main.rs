@@ -43,11 +43,5 @@ fn initialize() -> World {
         previous_frame_ts: now(),
     };
 
-    set_camera(&Camera3D {
-        position: vec3(-7., 3., 0.),
-        up: vec3(0., 1., 0.),
-        target: vec3(0., 3., 0.),
-        ..Default::default()
-    });
     world
 }

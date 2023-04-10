@@ -2,6 +2,12 @@ use crate::world::World;
 use macroquad::prelude::*;
 
 pub fn draw(world: &World) {
+    set_camera(&Camera3D {
+        position: vec3(-7.0  + world.player_pos.x, 3., 0.),
+        up: vec3(0., 1., 0.),
+        target: vec3(0. + world.player_pos.x, 3., 0.),
+        ..Default::default()
+    });
     clear_background(LIGHTGRAY);
     draw_grid(20, 1., BLACK, GRAY);
     draw_cube_from_floor(world.player_pos, Vec3::new(1.0, 2.0, 1.0), None, BLUE);

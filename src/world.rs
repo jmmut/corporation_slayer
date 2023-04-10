@@ -1,5 +1,5 @@
 use crate::common::TimestampSeconds;
-use crate::screen::commands::{Commands, SideMovement};
+use crate::screen::commands::{Commands, Movement};
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
 
@@ -23,15 +23,18 @@ impl World {
 
     fn update_side_movement(&mut self, commands: &Commands) {
         let dt = (commands.ts_now - self.previous_frame_ts) as f32;
-        match commands.side_movement {
-            SideMovement::None => {}
-            SideMovement::Right => {
-                self.player_pos.z = TUNNEL_HALF_WIDTH.min(self.player_pos.z + SPEED * dt);
-            }
-            SideMovement::Left => {
-                self.player_pos.z = (-TUNNEL_HALF_WIDTH).max(self.player_pos.z - SPEED * dt);
-            }
-        }
+        let dz = match commands.left_movement {
+            Movement::None => 0.0,
+            Movement::Positive => -SPEED * dt,
+            Movement::Negative => SPEED * dt,
+        };
+        let dx = match commands.forward_movement {
+            Movement::None => 0.0,
+            Movement::Positive => SPEED * dt,
+            Movement::Negative => -SPEED * dt,
+        };
+        self.player_pos.x = self.player_pos.x + dx;
+        self.player_pos.z = (self.player_pos.z + dz).clamp(-TUNNEL_HALF_WIDTH, TUNNEL_HALF_WIDTH);
     }
     fn update_jumped(&mut self, commands: &Commands) {
         let now_ts = commands.ts_now;

@@ -4,40 +4,48 @@ use macroquad::prelude::*;
 
 pub struct Commands {
     pub should_quit: bool,
-    pub side_movement: SideMovement,
+    pub forward_movement: Movement,
+    pub left_movement: Movement,
     pub jump: bool,
     pub ts_now: TimestampSeconds,
 }
 
-pub enum SideMovement {
+pub enum Movement {
     None,
-    Right,
-    Left,
+    Positive,
+    Negative,
 }
 
 pub fn get_commands() -> Commands {
     Commands {
         should_quit: is_key_pressed(KeyCode::Escape),
-        side_movement: get_side_movement(),
+        forward_movement: get_forward_movement(),
+        left_movement: get_side_movement(),
         jump: get_jump(),
         ts_now: now(),
     }
 }
 
 fn get_jump() -> bool {
-    is_key_down(KeyCode::Space) || is_key_down(KeyCode::Up)
+    is_key_down(KeyCode::Space)
 }
 
-fn get_side_movement() -> SideMovement {
-    let left = is_key_down(KeyCode::Left);
-    let right = is_key_down(KeyCode::Right);
-    if left && right {
-        SideMovement::None
-    } else if left {
-        SideMovement::Left
-    } else if right {
-        SideMovement::Right
+fn get_side_movement() -> Movement {
+    get_cancellable_movement(is_key_down(KeyCode::Left), is_key_down(KeyCode::Right))
+}
+
+fn get_forward_movement() -> Movement {
+    get_cancellable_movement(is_key_down(KeyCode::Up), is_key_down(KeyCode::Down))
+}
+
+fn get_cancellable_movement(positive: bool, negative: bool) -> Movement {
+    if positive && negative {
+        Movement::None
+    } else if positive {
+        Movement::Positive
+    } else if negative {
+        Movement::Negative
     } else {
-        SideMovement::None
+        Movement::None
     }
 }
