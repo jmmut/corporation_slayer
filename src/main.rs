@@ -13,6 +13,7 @@ const DEFAULT_WINDOW_HEIGHT: i32 = 640;
 async fn main() {
     let mut world = World {
         player_pos: Vec3::new(0.0, 1.0, 0.0),
+        jump_started: 0.0,
     };
 
     set_camera(&Camera3D {
@@ -31,6 +32,12 @@ async fn main() {
         clear_background(LIGHTGRAY);
         draw_grid(20, 1., BLACK, GRAY);
         draw_cube(world.player_pos, Vec3::new(1.0, 2.0, 1.0), None, BLUE);
+        draw_cube(
+            Vec3::new(0.0, 0.5, 1.0),
+            Vec3::new(1.0, 1.0, 1.0),
+            None,
+            GREEN,
+        );
         next_frame().await
     }
 }
