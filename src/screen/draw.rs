@@ -3,15 +3,19 @@ use macroquad::prelude::*;
 
 pub fn draw(world: &World) {
     set_camera(&Camera3D {
-        position: vec3(-7.0  + world.player_pos.x, 3., 0.),
-        up: vec3(0., 1., 0.),
-        target: vec3(0. + world.player_pos.x, 3., 0.),
+        position: vec3(-5.0  + world.player_pos.x, 3.0, 0.0),
+        up: vec3(0.0, 1.0, 0.0),
+        target: vec3(0. + world.player_pos.x, 0.0, 0.0),
         ..Default::default()
     });
     clear_background(LIGHTGRAY);
     draw_grid(20, 1., BLACK, GRAY);
-    draw_cube_from_floor(world.player_pos, Vec3::new(1.0, 2.0, 1.0), None, BLUE);
+    draw_player(world);
     draw_obstacles(&world.obstacles);
+}
+
+fn draw_player(world: &World) {
+    draw_cube_from_floor(world.player_pos, Vec3::new(1.0, 1.75, 1.0), None, BLUE);
 }
 
 pub fn draw_cube_from_floor(
@@ -29,7 +33,7 @@ pub fn draw_cube_from_floor(
 }
 
 pub fn draw_obstacles(obstacles: &Vec<Vec3>) {
-    let size = Vec3::new(1.0, 1.0, 1.0);
+    let size = Vec3::new(0.8, 0.5, 0.8);
     for obstacle in obstacles {
         draw_cube_from_floor(*obstacle, size, None, RED);
     }

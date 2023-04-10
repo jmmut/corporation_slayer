@@ -1,3 +1,4 @@
+use std::f32::consts::SQRT_2;
 use crate::common::TimestampSeconds;
 use crate::screen::commands::{Commands, Movement};
 use macroquad::miniquad::date::now;
@@ -5,7 +6,7 @@ use macroquad::prelude::*;
 
 const SPEED: f32 = 10.0;
 const TUNNEL_HALF_WIDTH: f32 = 1.5;
-const JUMP_DURATION: f64 = 1.0;
+const JUMP_DURATION: f64 = 0.3;
 
 pub struct World {
     pub player_pos: Vec3,
@@ -23,16 +24,20 @@ impl World {
 
     fn update_side_movement(&mut self, commands: &Commands) {
         let dt = (commands.ts_now - self.previous_frame_ts) as f32;
-        let dz = match commands.left_movement {
+        let mut dz = match commands.left_movement {
             Movement::None => 0.0,
             Movement::Positive => -SPEED * dt,
             Movement::Negative => SPEED * dt,
         };
-        let dx = match commands.forward_movement {
+        let mut dx = match commands.forward_movement {
             Movement::None => 0.0,
             Movement::Positive => SPEED * dt,
             Movement::Negative => -SPEED * dt,
         };
+        if dx != 0.0 && dz != 0.0 {
+            dx = dx / SQRT_2;
+            dz = dz / SQRT_2;
+        }
         self.player_pos.x = self.player_pos.x + dx;
         self.player_pos.z = (self.player_pos.z + dz).clamp(-TUNNEL_HALF_WIDTH, TUNNEL_HALF_WIDTH);
     }
