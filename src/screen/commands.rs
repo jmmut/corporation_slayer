@@ -1,9 +1,12 @@
+use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
+use crate::common::TimestampSeconds;
 
 pub struct Commands {
     pub should_quit: bool,
     pub side_movement: SideMovement,
     pub jump: bool,
+    pub ts_now: TimestampSeconds,
 }
 
 pub enum SideMovement {
@@ -17,6 +20,7 @@ pub fn get_commands() -> Commands {
         should_quit: is_key_pressed(KeyCode::Escape),
         side_movement: get_side_movement(),
         jump: get_jump(),
+        ts_now: now()
     }
 }
 

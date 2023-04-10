@@ -84,6 +84,7 @@ name = "corporation_slayer"
 version = "0.1.0"
 dependencies = [
  "macroquad",
+ "quad-rand",
 ]
 
 [[package]]
