@@ -1,10 +1,10 @@
+mod common;
 mod screen;
 mod world;
-mod common;
 
-use macroquad::miniquad::date::now;
 use crate::screen::commands::get_commands;
 use crate::world::{generate_obstacles, World};
+use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
 use screen::draw;
 
@@ -36,8 +36,8 @@ fn window_conf() -> Conf {
 }
 
 fn initialize() -> World {
-    let mut world = World {
-        player_pos: Vec3::new(0.0, 1.0, 0.0),
+    let world = World {
+        player_pos: Vec3::new(0.0, 0.0, 0.0),
         jump_started: 0.0,
         obstacles: generate_obstacles(),
         previous_frame_ts: now(),
