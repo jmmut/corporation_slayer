@@ -27,15 +27,21 @@ pub fn get_commands() -> Commands {
 }
 
 fn get_jump() -> bool {
-    is_key_down(KeyCode::Space)
+    is_key_pressed(KeyCode::Space)
 }
 
 fn get_side_movement() -> Movement {
-    get_cancellable_movement(is_key_down(KeyCode::Left), is_key_down(KeyCode::Right))
+    get_cancellable_movement(
+        is_key_down(KeyCode::Left) || is_key_down(KeyCode::A),
+        is_key_down(KeyCode::Right) || is_key_down(KeyCode::D),
+    )
 }
 
 fn get_forward_movement() -> Movement {
-    get_cancellable_movement(is_key_down(KeyCode::Up), is_key_down(KeyCode::Down))
+    get_cancellable_movement(
+        is_key_down(KeyCode::Up) || is_key_down(KeyCode::W),
+        is_key_down(KeyCode::Down) || is_key_down(KeyCode::S),
+    )
 }
 
 fn get_cancellable_movement(positive: bool, negative: bool) -> Movement {

@@ -14,14 +14,14 @@ const DEFAULT_WINDOW_HEIGHT: i32 = 640;
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut world = initialize();
+    let mut world = World::new();
     loop {
         let commands = get_commands();
         if commands.should_quit {
             break;
         }
         world.update(commands);
-        draw::draw(&world);
+        let should_restart = draw::draw(&mut world);
         next_frame().await
     }
 }
@@ -33,16 +33,4 @@ fn window_conf() -> Conf {
         window_height: DEFAULT_WINDOW_HEIGHT,
         ..Default::default()
     }
-}
-
-fn initialize() -> World {
-    let world = World {
-        player_pos: Vec3::new(0.0, 0.0, 0.0),
-        jump_started: 0.0,
-        obstacles: generate_obstacles(),
-        previous_frame_ts: now(),
-        colliding: false,
-    };
-
-    world
 }

@@ -1,8 +1,8 @@
-use std::f32::consts::SQRT_2;
 use crate::common::TimestampSeconds;
 use crate::screen::commands::{Commands, Movement};
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
+use std::f32::consts::SQRT_2;
 
 const SPEED: f32 = 10.0;
 const TUNNEL_HALF_WIDTH: f32 = 1.5;
@@ -15,14 +15,29 @@ pub struct World {
     pub obstacles: Vec<Vec3>,
     pub previous_frame_ts: TimestampSeconds,
     pub colliding: bool,
+    pub health: f32,
 }
 
 impl World {
+    pub fn new() -> Self {
+        Self {
+            health: 1.0,
+            player_pos: Vec3::new(0.0, 0.0, 0.0),
+            jump_started: 0.0,
+            obstacles: generate_obstacles(),
+            previous_frame_ts: now(),
+            colliding: false,
+        }
+    }
+
     pub fn update(&mut self, commands: Commands) {
-        self.update_side_movement(&commands);
-        self.update_jumped(&commands);
-        self.update_collision();
-        self.update_time(&commands);
+        if self.health > 0.0 {
+            self.update_side_movement(&commands);
+            self.update_jumped(&commands);
+            self.update_collision();
+            self.update_health(&commands);
+            self.update_time(&commands);
+        }
     }
 
     fn update_side_movement(&mut self, commands: &Commands) {
@@ -52,7 +67,7 @@ impl World {
             self.jump_started = now_ts;
         }
         if jumping {
-            let height: f64 = 1.0;
+            let height: f64 = 1.5;
             let offset = JUMP_DURATION * 0.5;
             // let jump_speed = (height/offset).sqrt();
             let jump_speed = 1.0;
@@ -66,7 +81,7 @@ impl World {
     }
     fn update_collision(&mut self) {
         for obstacle in &self.obstacles {
-            if collides(self.player_pos,*obstacle) {
+            if collides(self.player_pos, *obstacle) {
                 self.colliding = true;
                 return;
             }
@@ -77,13 +92,21 @@ impl World {
     fn update_time(&mut self, commands: &Commands) {
         self.previous_frame_ts = commands.ts_now;
     }
+    fn update_health(&mut self, commands: &Commands) {
+        let pain_speed = 1.0;
+        if self.colliding {
+            let dt = commands.ts_now - self.previous_frame_ts;
+            self.health -= (dt * pain_speed) as f32;
+            self.health = self.health.clamp(0.0, 1.0);
+        }
+    }
 }
 
 pub fn generate_obstacles() -> Vec<Vec3> {
     const NUM_OBSTACLES: usize = 10;
     const LANES: i32 = 4;
     let mut obstacles = Vec::with_capacity(NUM_OBSTACLES as usize);
-    let mut depth = 0.0;
+    let mut depth = 2.0;
     rand::srand(unsafe { now().floor().to_int_unchecked() });
     loop {
         for i_lane in 0..LANES {
@@ -105,8 +128,8 @@ fn collides(player_pos: Vec3, obstacle_pos: Vec3) -> bool {
     let dx = player_pos.x - obstacle_pos.x;
     let dy = player_pos.y - obstacle_pos.y;
     let dz = player_pos.z - obstacle_pos.z;
-    let squared_distance = dx*dx + dy*dy + dz*dz;
+    let squared_distance = dx * dx + dy * dy + dz * dz;
     let radius = obstacle_radius + player_radius;
-    let squared_min_distance = radius*radius;
+    let squared_min_distance = radius * radius;
     squared_distance < squared_min_distance
 }
