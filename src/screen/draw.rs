@@ -1,4 +1,5 @@
 use crate::world::{World, PLAYER_HEIGHT};
+use macroquad::miniquad::date::now;
 use macroquad::models::Vertex;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
@@ -113,32 +114,33 @@ fn draw_level_finished(world: &mut World) {
         Window::new(1, Vec2::new(w / 4.0, h / 4.0), Vec2::new(w / 2.0, h / 4.0))
             .label(&format!("Level {} completed!", world.level + 1))
             .ui(&mut root_ui(), |ui| {
-                if Button::new(format!("Continue to level {}", world.level + 2).as_str()).ui(ui) {
+                if Button::new(format!("Continue to level {}", world.level + 2).as_str()).ui(ui)
+                    || is_key_down(KeyCode::Space)
+                {
                     let next_level = world.level + 1;
                     let current_health = world.health;
-                    *world = World::new();
+                    let current_start = world.game_start;
+                    *world = World::new(next_level);
                     world.health = current_health;
                     world.level = next_level;
+                    world.game_start = current_start;
                 }
             });
     }
 }
 
 fn draw_game_over(world: &mut World) {
-    let mut should_restart = false;
-    if world.health == 0.0 {
+    if let Some(end) = world.game_end {
         let w = screen_width();
         let h = screen_height();
         Window::new(1, Vec2::new(w / 4.0, h / 4.0), Vec2::new(w / 2.0, h / 4.0))
             .label("Game Over")
             .ui(&mut root_ui(), |ui| {
-                Label::new(format!(
-                    "You run for {} levels and {:.2} meters",
-                    world.level, world.player_pos.x
-                ))
-                .ui(ui);
+                Label::new(format!("Reached level {}", world.level + 1)).ui(ui);
+                Label::new(format!("(and {:.2} meters)", world.player_pos.x)).ui(ui);
+                Label::new(format!("in {:.3} seconds", end - world.game_start)).ui(ui);
                 if Button::new("Restart").ui(ui) {
-                    *world = World::new();
+                    *world = World::new(0);
                 }
             });
     }

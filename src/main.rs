@@ -14,7 +14,7 @@ const DEFAULT_WINDOW_HEIGHT: i32 = 640;
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut world = World::new();
+    let mut world = World::new(0);
     loop {
         let commands = get_commands();
         if commands.should_quit {

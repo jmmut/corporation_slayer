@@ -17,18 +17,22 @@ pub struct World {
     pub colliding: bool,
     pub health: f32,
     pub level: i32,
+    pub game_start: TimestampSeconds,
+    pub game_end: Option<TimestampSeconds>,
 }
 
 impl World {
-    pub fn new() -> Self {
+    pub fn new(level: i32) -> Self {
         Self {
             health: 1.0,
             player_pos: Vec3::new(0.0, 0.0, 0.0),
             jump_started: 0.0,
-            obstacles: generate_obstacles(),
+            obstacles: generate_obstacles(level),
             previous_frame_ts: now(),
             colliding: false,
-            level: 0,
+            level,
+            game_start: now(),
+            game_end: None,
         }
     }
 
@@ -92,31 +96,35 @@ impl World {
         self.colliding = false;
     }
 
-    fn update_time(&mut self, commands: &Commands) {
-        self.previous_frame_ts = commands.ts_now;
-    }
     fn update_health(&mut self, commands: &Commands) {
         let pain_speed = 1.0;
         if self.colliding {
             let dt = commands.ts_now - self.previous_frame_ts;
             self.health -= (dt * pain_speed) as f32;
             self.health = self.health.clamp(0.0, 1.0);
+            if self.health == 0.0 {
+                self.game_end = Some(commands.ts_now);
+            }
         }
+    }
+
+    fn update_time(&mut self, commands: &Commands) {
+        self.previous_frame_ts = commands.ts_now;
     }
 }
 
-pub fn generate_obstacles() -> Vec<Vec3> {
-    const NUM_OBSTACLES: usize = 20;
+pub fn generate_obstacles(level: i32) -> Vec<Vec3> {
+    let num_obstacles = 15 + level;
     const LANES: i32 = 4;
-    let mut obstacles = Vec::with_capacity(NUM_OBSTACLES as usize);
-    let mut depth = 2.0;
+    let mut obstacles = Vec::with_capacity(num_obstacles as usize);
+    let mut depth = 3.0;
     rand::srand(unsafe { now().floor().to_int_unchecked() });
     loop {
         for i_lane in 0..LANES {
             let sample = rand::gen_range(0, 100);
-            if sample < 20 {
+            if sample < 15 + level {
                 obstacles.push(Vec3::new(depth, 0.0, i_lane as f32 - 1.5));
-                if obstacles.len() == NUM_OBSTACLES {
+                if obstacles.len() == num_obstacles as usize {
                     return obstacles;
                 }
             }
