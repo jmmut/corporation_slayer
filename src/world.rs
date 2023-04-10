@@ -16,6 +16,7 @@ pub struct World {
     pub previous_frame_ts: TimestampSeconds,
     pub colliding: bool,
     pub health: f32,
+    pub level: i32,
 }
 
 impl World {
@@ -27,6 +28,7 @@ impl World {
             obstacles: generate_obstacles(),
             previous_frame_ts: now(),
             colliding: false,
+            level: 0,
         }
     }
 
@@ -104,7 +106,7 @@ impl World {
 }
 
 pub fn generate_obstacles() -> Vec<Vec3> {
-    const NUM_OBSTACLES: usize = 10;
+    const NUM_OBSTACLES: usize = 20;
     const LANES: i32 = 4;
     let mut obstacles = Vec::with_capacity(NUM_OBSTACLES as usize);
     let mut depth = 2.0;
@@ -112,7 +114,7 @@ pub fn generate_obstacles() -> Vec<Vec3> {
     loop {
         for i_lane in 0..LANES {
             let sample = rand::gen_range(0, 100);
-            if sample < 10 {
+            if sample < 20 {
                 obstacles.push(Vec3::new(depth, 0.0, i_lane as f32 - 1.5));
                 if obstacles.len() == NUM_OBSTACLES {
                     return obstacles;
