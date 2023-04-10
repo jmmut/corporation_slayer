@@ -32,7 +32,7 @@ impl World {
 
     pub fn update(&mut self, commands: Commands) {
         if self.health > 0.0 {
-            self.update_side_movement(&commands);
+            self.update_position(&commands);
             self.update_jumped(&commands);
             self.update_collision();
             self.update_health(&commands);
@@ -40,7 +40,7 @@ impl World {
         }
     }
 
-    fn update_side_movement(&mut self, commands: &Commands) {
+    fn update_position(&mut self, commands: &Commands) {
         let dt = (commands.ts_now - self.previous_frame_ts) as f32;
         let mut dz = match commands.left_movement {
             Movement::None => 0.0,
@@ -56,9 +56,10 @@ impl World {
             dx = dx / SQRT_2;
             dz = dz / SQRT_2;
         }
-        self.player_pos.x = self.player_pos.x + dx;
+        self.player_pos.x = (self.player_pos.x + dx).max(0.0);
         self.player_pos.z = (self.player_pos.z + dz).clamp(-TUNNEL_HALF_WIDTH, TUNNEL_HALF_WIDTH);
     }
+
     fn update_jumped(&mut self, commands: &Commands) {
         let now_ts = commands.ts_now;
         let jump_time = commands.ts_now - self.jump_started;

@@ -2,19 +2,52 @@ use crate::world::{World, PLAYER_HEIGHT};
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
+use macroquad::models::Vertex;
 
 pub fn draw(world: &mut World) {
     set_camera(&Camera3D {
-        position: vec3(-5.0 + world.player_pos.x, 3.0, 0.0),
+        position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0),
         up: vec3(0.0, 1.0, 0.0),
-        target: vec3(0. + world.player_pos.x, 0.0, 0.0),
+        target: vec3(2.0 + world.player_pos.x, 0.0, 0.0),
         ..Default::default()
     });
-    clear_background(LIGHTGRAY);
-    draw_grid(20, 1., BLACK, GRAY);
+    clear_background(GRAY);
+    // draw_grid(20, 1., BLACK, GRAY);
+    draw_walls();
     draw_player(world);
     draw_obstacles(&world.obstacles);
     draw_hud(world);
+}
+
+fn draw_walls() {
+    let v0 = Vec3::new(-5.0, 6.0, -2.0);
+    let v0v1 = Vec3::new(0.0, -6.0, 0.0);
+    let v0v3 = Vec3::new(50.0, 0.0, 0.0);
+    let corners = compute_plane_corners(v0, v0v1, v0v3);
+    draw_mesh(&Mesh{
+        texture: None,
+        vertices: point_to_vertex_no_texture(corners, LIGHTGRAY),
+        indices: vec![0, 1, 2, 0, 2, 3]
+    });
+    let v0 = Vec3::new(- 5.0, 6.0, 2.0);
+    let v0v1 = Vec3::new(0.0, -6.0, 0.0);
+    let v0v3 = Vec3::new(50.0, 0.0, 0.0);
+    let corners = compute_plane_corners(v0, v0v1, v0v3);
+    draw_mesh(&Mesh{
+        texture: None,
+        vertices: point_to_vertex_no_texture(corners, LIGHTGRAY),
+        indices: vec![0, 1, 2, 0, 2, 3]
+    });
+}
+
+fn compute_plane_corners(v0: Vec3, v0v1: Vec3, v0v3: Vec3) -> Vec<Vec3> {
+    vec![v0, v0 + v0v1, v0 + v0v1 + v0v3, v0 + v0v3]
+}
+
+fn point_to_vertex_no_texture(points : Vec<Vec3>, color :Color) -> Vec<Vertex> {
+    points.iter().map( |p| {
+        Vertex {position: *p, uv: Vec2::new(0.0, 0.0), color}
+    }).collect()
 }
 
 fn draw_player(world: &World) {
