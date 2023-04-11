@@ -2,18 +2,22 @@ mod common;
 mod screen;
 mod world;
 
+use clap::Parser;
+use git_version::git_version;
 use crate::screen::commands::get_commands;
 use crate::world::World;
 use macroquad::prelude::*;
 use screen::draw;
 
+const GIT_VERSION: &str = git_version!(args = ["--tags", "--dirty"]);
 const DEFAULT_WINDOW_TITLE: &'static str = "Corporation slayer";
 const DEFAULT_WINDOW_WIDTH: i32 = 480;
 const DEFAULT_WINDOW_HEIGHT: i32 = 640;
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut world = World::new(0);
+    let args = CliArgs::parse();
+    let mut world = World::new(args.level);
     loop {
         let commands = get_commands();
         if commands.should_quit {
@@ -23,6 +27,13 @@ async fn main() {
         draw::draw(&mut world);
         next_frame().await
     }
+}
+
+#[derive(Parser, Debug)]
+#[clap(version = GIT_VERSION)]
+struct CliArgs {
+    #[clap(long, help = "Starting level.", default_value = "0")]
+    level: i32,
 }
 
 fn window_conf() -> Conf {
