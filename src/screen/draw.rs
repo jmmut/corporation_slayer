@@ -3,6 +3,8 @@ use macroquad::models::Vertex;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
+use crate::common::TimestampSeconds;
+use crate::world::obstacles::Obstacles;
 
 pub fn draw(world: &mut World) {
     set_camera(&Camera3D {
@@ -15,13 +17,13 @@ pub fn draw(world: &mut World) {
     // draw_grid(20, 1., BLACK, GRAY);
     draw_walls(world);
     draw_player(world);
-    draw_obstacles(&world.obstacles);
+    draw_obstacles(&world.obstacles, world.previous_frame_ts);
     draw_hud(world);
 }
 
 fn draw_walls(world: &World) {
     let starting_wall = 5.0;
-    let end_x = world.obstacles.last().unwrap().x + 10.0 + starting_wall;
+    let end_x = world.obstacles.last().unwrap().get_pos(world.previous_frame_ts).x + 10.0 + starting_wall;
     let v0 = Vec3::new(-5.0, 6.0, -2.0);
     let v0v1 = Vec3::new(0.0, -6.0, 0.0);
     let v0v3 = Vec3::new(end_x, 0.0, 0.0);
@@ -77,10 +79,10 @@ pub fn draw_cube_from_floor(
     draw_cube(floor_position + offset, size, texture, color);
 }
 
-pub fn draw_obstacles(obstacles: &Vec<Vec3>) {
+pub fn draw_obstacles(obstacles: &Obstacles, ts: TimestampSeconds) {
     let size = Vec3::new(0.8, 0.5, 0.8);
     for obstacle in obstacles {
-        draw_cube_from_floor(*obstacle, size, None, ORANGE);
+        draw_cube_from_floor(obstacle.get_pos(ts), size, None, obstacle.get_color());
     }
 }
 
@@ -106,7 +108,7 @@ fn draw_health(world: &World) {
 }
 
 fn draw_level_finished(world: &mut World) {
-    let end_x = world.obstacles.last().unwrap().x + 10.0;
+    let end_x = world.obstacles.last().unwrap().get_pos(world.previous_frame_ts).x + 10.0;
     if world.player_pos.x > end_x {
         let w = screen_width();
         let h = screen_height();
