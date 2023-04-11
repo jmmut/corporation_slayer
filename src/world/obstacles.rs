@@ -55,7 +55,7 @@ pub fn generate_obstacles(level: i32, seed: u64) -> Vec<Obstacle> {
     let mut depth = 3.0;
     rand::srand(seed);
     loop {
-        let moving_obstacle_chance = (30 + level).min(100);
+        let moving_obstacle_chance = (0 + level*2).min(90);
         if percentage_chance(moving_obstacle_chance) {
             obstacles.push(Obstacle::new_moving(depth, 0.0, -3.0, coin_flip()));
             if obstacles.len() == num_obstacles as usize {
