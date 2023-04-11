@@ -4,9 +4,10 @@ use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
 use crate::common::TimestampSeconds;
+use crate::screen::models::Models;
 use crate::world::obstacles::Obstacles;
 
-pub fn draw(world: &mut World) {
+pub fn draw(world: &mut World, models: &Models) {
     set_camera(&Camera3D {
         position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0),
         up: vec3(0.0, 1.0, 0.0),
