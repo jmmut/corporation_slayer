@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use crate::common::TimestampSeconds;
 use crate::screen::models::{Model, Models};
 use crate::world::obstacles::Obstacles;
@@ -8,21 +9,46 @@ use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
 
 const FONT_SIZE: f32 = 16.0;
+const PISS_SPEED: f32 = 10.0;
+const PISS_YELLOW: Color = Color::new(0.9, 0.9, 0.0, 1.0);
 
-pub fn draw(world: &mut World, models: &Models) {
-    set_camera(&Camera3D {
-        position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0),
-        up: vec3(0.0, 1.0, 0.0),
-        target: vec3(2.0 + world.player_pos.x, 0.0, 0.0),
-        ..Default::default()
-    });
-    clear_background(GRAY);
-    // draw_grid(20, 1., BLACK, GRAY);
-    draw_walls(world);
-    draw_player(world, &models.player);
-    draw_obstacles(&world.obstacles, world.previous_frame_ts);
-    draw_hud(world);
+pub struct Drawer {
+    piss_particles: VecDeque<Vec3>,
 }
+
+impl Drawer {
+    pub fn new() -> Self {
+        Self { piss_particles: VecDeque::new() }
+    }
+
+    pub fn draw(&mut self, world: &mut World, models: &Models) {
+        set_camera(&Camera3D {
+            position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0),
+            up: vec3(0.0, 1.0, 0.0),
+            target: vec3(2.0 + world.player_pos.x, 0.0, 0.0),
+            ..Default::default()
+        });
+        clear_background(GRAY);
+        // draw_grid(20, 1., BLACK, GRAY);
+        draw_walls(world);
+        draw_player(world, &models.player);
+        draw_obstacles(&world.obstacles, world.previous_frame_ts);
+        self.draw_piss_spray(world);
+        draw_hud(world);
+    }
+
+    pub fn draw_piss_spray(&mut self, world: &World) {
+        if world.pissing {
+            self.piss_particles.push_back(world.player_pos);
+        }
+        let dt = world.now_ts - world.previous_frame_ts;
+        for particle in &mut self.piss_particles {
+            particle.x += PISS_SPEED * dt as f32;
+            draw_cube_from_floor(*particle, Vec3::new(0.1, 0.1, 0.1), None, PISS_YELLOW)
+        }
+    }
+}
+
 
 fn draw_walls(world: &World) {
     let starting_wall = 5.0;
@@ -141,8 +167,7 @@ fn draw_piss(world: &World) {
         padding,
         width * world.piss,
         padding * 2.0,
-        Color::new(0.9, 0.9, 0.0, 1.0),
-        // YELLOW,
+        PISS_YELLOW,
     );
     draw_rectangle_lines(padding + 0.5*full_width, padding, width, padding * 2.0, 4.0, BLACK);
     let text = "PISS";

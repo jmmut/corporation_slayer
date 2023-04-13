@@ -10,6 +10,7 @@ use clap::Parser;
 use git_version::git_version;
 use macroquad::prelude::*;
 use screen::draw;
+use crate::screen::draw::Drawer;
 
 const GIT_VERSION: &str = git_version!(args = ["--tags", "--dirty"]);
 const DEFAULT_WINDOW_TITLE: &'static str = "Corporation slayer";
@@ -21,13 +22,14 @@ async fn main() -> Result<(), AnyError> {
     let args = CliArgs::parse();
     let models = load_models()?;
     let mut world = World::new(args.level);
+    let mut drawer = Drawer::new();
     loop {
         let commands = get_commands();
         if commands.should_quit {
             break;
         }
         world.update(commands);
-        draw::draw(&mut world, &models);
+        drawer.draw(&mut world, &models);
         next_frame().await
     }
     Ok(())

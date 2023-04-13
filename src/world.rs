@@ -17,7 +17,9 @@ pub struct World {
     pub jump_started: TimestampSeconds,
     pub obstacles: Obstacles,
     pub previous_frame_ts: TimestampSeconds,
+    pub now_ts: TimestampSeconds,
     pub colliding: bool,
+    pub pissing: bool,
     pub health: f32,
     pub piss: f32,
     pub level: i32,
@@ -34,7 +36,9 @@ impl World {
             jump_started: 0.0,
             obstacles: Vec::new(),
             previous_frame_ts: now(),
+            now_ts: now(),
             colliding: false,
+            pissing: false,
             level,
             game_start: now(),
             game_end: None,
@@ -45,11 +49,12 @@ impl World {
 
     pub fn update(&mut self, commands: Commands) {
         if self.health > 0.0 {
+            self.update_time(&commands);
             self.update_player_position(&commands);
             self.update_jumped(&commands);
             self.update_collision();
             self.update_health(&commands);
-            self.update_time(&commands);
+            self.update_pissing(&commands);
         }
     }
 
@@ -80,11 +85,11 @@ impl World {
     }
 
     fn update_jumped(&mut self, commands: &Commands) {
-        let now_ts = commands.ts_now;
+        self.now_ts = commands.ts_now;
         let jump_time = commands.ts_now - self.jump_started;
         let jumping = jump_time < JUMP_DURATION;
         if commands.jump && !jumping {
-            self.jump_started = now_ts;
+            self.jump_started = self.now_ts;
         }
         if jumping {
             let height: f64 = 1.5;
@@ -122,8 +127,20 @@ impl World {
         }
     }
 
+    fn update_pissing(&mut self, commands: &Commands) {
+        self.pissing = if self.piss > 0.0 {
+            commands.piss
+        } else {
+            false
+        };
+        if self.pissing {
+            self.piss = 0.0_f32.max(self.piss - 0.01);
+        }
+    }
+
     fn update_time(&mut self, commands: &Commands) {
-        self.previous_frame_ts = commands.ts_now;
+        self.previous_frame_ts = self.now_ts;
+        self.now_ts = commands.ts_now;
     }
 }
 
