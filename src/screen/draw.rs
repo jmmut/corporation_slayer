@@ -141,6 +141,8 @@ fn draw_level_finished(world: &mut World) {
             .ui(&mut root_ui(), |ui| {
                 if Button::new(format!("Continue to level {}", world.level + 2).as_str()).ui(ui)
                     || is_key_down(KeyCode::Space)
+                    || is_key_down(KeyCode::Enter)
+                    || is_key_down(KeyCode::KpEnter)
                 {
                     let next_level = world.level + 1;
                     let current_health = world.health;
@@ -164,7 +166,11 @@ fn draw_game_over(world: &mut World) {
                 Label::new(format!("Reached level {}", world.level + 1)).ui(ui);
                 Label::new(format!("(and {:.2} meters)", world.player_pos.x)).ui(ui);
                 Label::new(format!("in {:.3} seconds", end - world.game_start)).ui(ui);
-                if Button::new("Restart").ui(ui) {
+                if Button::new("Restart").ui(ui)
+                    || is_key_down(KeyCode::Space)
+                    || is_key_down(KeyCode::Enter)
+                    || is_key_down(KeyCode::KpEnter)
+                {
                     *world = World::new(0);
                 }
             });
