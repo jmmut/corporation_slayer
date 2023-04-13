@@ -14,12 +14,11 @@ const PISS_YELLOW: Color = Color::new(0.9, 0.9, 0.0, 1.0);
 const PLAYER_COLOR: Color = Color::new(0.00, 0.47, 0.95, 0.3);
 
 pub struct Drawer {
-    piss_particles: VecDeque<Vec3>,
 }
 
 impl Drawer {
     pub fn new() -> Self {
-        Self { piss_particles: VecDeque::new() }
+        Self { }
     }
 
     pub fn draw(&mut self, world: &mut World, models: &Models) {
@@ -39,13 +38,8 @@ impl Drawer {
     }
 
     pub fn draw_piss_spray(&mut self, world: &World) {
-        if world.pissing {
-            self.piss_particles.push_back(world.player_pos);
-        }
-        let dt = world.now_ts - world.previous_frame_ts;
-        for particle in &mut self.piss_particles {
-            particle.x += PISS_SPEED * dt as f32;
-            draw_cube_from_floor(*particle, Vec3::new(0.1, 0.1, 0.1), None, PISS_YELLOW)
+        for particle in &world.piss_particles {
+            draw_cube_from_floor(particle.position, Vec3::new(0.1, 0.1, 0.1), None, PISS_YELLOW)
         }
     }
 }

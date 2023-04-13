@@ -1,5 +1,6 @@
 pub mod obstacles;
 
+use std::collections::VecDeque;
 use crate::common::TimestampSeconds;
 use crate::screen::commands::{Commands, Movement};
 use crate::world::obstacles::{generate_obstacles, Obstacles};
@@ -25,6 +26,12 @@ pub struct World {
     pub level: i32,
     pub game_start: TimestampSeconds,
     pub game_end: Option<TimestampSeconds>,
+    pub piss_particles: VecDeque<Particle>,
+}
+
+pub struct Particle {
+    pub position: Vec3,
+    started: TimestampSeconds,
 }
 
 impl World {
@@ -42,6 +49,7 @@ impl World {
             level,
             game_start: now(),
             game_end: None,
+            piss_particles: VecDeque::new(),
         };
         world.regenerate();
         world
@@ -62,6 +70,7 @@ impl World {
         self.obstacles = generate_obstacles(self.level, get_random_seed());
         self.player_pos = Vec3::new(0.0, 0.0, 0.0);
         self.jump_started = 0.0;
+        self.piss_particles = VecDeque::new();
     }
 
     fn update_player_position(&mut self, commands: &Commands) {
@@ -85,7 +94,6 @@ impl World {
     }
 
     fn update_jumped(&mut self, commands: &Commands) {
-        self.now_ts = commands.ts_now;
         let jump_time = commands.ts_now - self.jump_started;
         let jumping = jump_time < JUMP_DURATION;
         if commands.jump && !jumping {
@@ -128,13 +136,49 @@ impl World {
     }
 
     fn update_pissing(&mut self, commands: &Commands) {
+        // is the player pissing?
         self.pissing = if self.piss > 0.0 {
-            commands.piss
+            commands.pissing
         } else {
             false
         };
+
+        // reduce piss bar
         if self.pissing {
             self.piss = 0.0_f32.max(self.piss - 0.01);
+        }
+
+        // add piss particle
+        if self.pissing {
+            self.piss_particles.push_back(Particle {
+                position: self.player_pos,
+                started: self.now_ts,
+            });
+        }
+
+        // move piss particles
+        let mut particles_to_remove = 0;
+        for particle in &mut self.piss_particles {
+            let jump_time = commands.ts_now - particle.started;
+            let jumping = jump_time < JUMP_DURATION;
+            if jumping {
+                let height:f64 = 1.5;
+                let offset = JUMP_DURATION * 0.5;
+                // let jump_speed = (height/offset).sqrt();
+                let jump_speed = 1.0;
+                let height_coef = height / (offset * offset);
+                let x = jump_time * jump_speed - offset;
+                let y = height_coef * x * x;
+                particle.position.y = (height - y) as f32;
+                particle.position.x += (jump_time * jump_speed) as f32;
+            } else {
+                particles_to_remove += 1;
+            }
+        }
+
+        // remove piss particles when they touch the ground
+        for _ in 0..particles_to_remove {
+            self.piss_particles.pop_front();
         }
     }
 

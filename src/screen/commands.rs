@@ -8,7 +8,7 @@ pub struct Commands {
     pub left_movement: Movement,
     pub jump: bool,
     pub ts_now: TimestampSeconds,
-    pub piss: bool,
+    pub pissing: bool,
 }
 
 pub enum Movement {
@@ -24,7 +24,7 @@ pub fn get_commands() -> Commands {
         left_movement: get_side_movement(),
         jump: get_jump(),
         ts_now: now(),
-        piss: get_pissing(),
+        pissing: get_pissing(),
     }
 }
 
@@ -32,7 +32,7 @@ fn get_jump() -> bool {
     is_key_pressed(KeyCode::Space)
 }
 fn get_pissing() -> bool {
-    is_key_pressed(KeyCode::Enter)
+    is_key_down(KeyCode::Enter)
 }
 
 fn get_side_movement() -> Movement {
