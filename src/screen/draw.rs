@@ -2,7 +2,6 @@ use crate::common::TimestampSeconds;
 use crate::screen::models::{Model, Models};
 use crate::world::obstacles::Obstacles;
 use crate::world::{World, PLAYER_HEIGHT};
-use gltf::{Gltf, Primitive};
 use macroquad::models::Vertex;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
@@ -68,7 +67,7 @@ fn point_to_vertex_no_texture(points: Vec<Vec3>, color: Color) -> Vec<Vertex> {
         .collect()
 }
 
-fn draw_player(world: &World, model: &Model) {
+fn draw_player(world: &World, _model: &Model) {
     let color = if world.colliding { RED } else { BLUE };
     draw_cube_from_floor(
         world.player_pos,

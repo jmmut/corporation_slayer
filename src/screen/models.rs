@@ -1,6 +1,5 @@
 use crate::common::AnyError;
-use gltf::buffer::Data;
-use gltf::{buffer, image, Document, Gltf, Semantic};
+use gltf::{Semantic};
 use macroquad::models::Vertex;
 use macroquad::prelude::{Mesh, Vec2, Vec3, BLACK};
 use std::iter::Map;
@@ -25,13 +24,13 @@ pub fn load_models() -> Result<Models, AnyError> {
 }
 
 fn gltf_to_meshes(path: &str) -> Result<Vec<Mesh>, AnyError> {
-    let (document, buffers, images) = gltf::import(path)?;
+    let (document, buffers, _images) = gltf::import(path)?;
     let mut meshes = Vec::<Mesh>::new();
     for mesh in document.meshes() {
         for primitive in mesh.primitives() {
             let reader = primitive.reader(|buffer| Some(&buffers[buffer.index()]));
 
-            if let Some(accessor) = primitive.get(&Semantic::Positions) {
+            if let Some(_accessor) = primitive.get(&Semantic::Positions) {
                 let positions: Vec<[f32; 3]> = reader
                     .read_positions()
                     .expect("Position primitives should be present")
