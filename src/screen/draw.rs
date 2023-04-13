@@ -1,10 +1,11 @@
+use gltf::{Gltf, Primitive};
 use crate::world::{World, PLAYER_HEIGHT};
 use macroquad::models::Vertex;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
 use crate::common::TimestampSeconds;
-use crate::screen::models::Models;
+use crate::screen::models::{Model, Models};
 use crate::world::obstacles::Obstacles;
 
 pub fn draw(world: &mut World, models: &Models) {
@@ -17,7 +18,7 @@ pub fn draw(world: &mut World, models: &Models) {
     clear_background(GRAY);
     // draw_grid(20, 1., BLACK, GRAY);
     draw_walls(world);
-    draw_player(world);
+    draw_player(world, &models.player);
     draw_obstacles(&world.obstacles, world.previous_frame_ts);
     draw_hud(world);
 }
@@ -60,7 +61,7 @@ fn point_to_vertex_no_texture(points: Vec<Vec3>, color: Color) -> Vec<Vertex> {
         .collect()
 }
 
-fn draw_player(world: &World) {
+fn draw_player(world: &World, model: &Model) {
     let color = if world.colliding { RED } else { BLUE };
     draw_cube_from_floor(
         world.player_pos,
@@ -68,6 +69,15 @@ fn draw_player(world: &World) {
         None,
         color,
     );
+    push_camera_state();
+    set_camera(&Camera3D {
+        position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0) - world.player_pos,
+        up: vec3(0.0, 1.0, 0.0),
+        target: vec3(2.0 + world.player_pos.x, 0.0, 0.0) - world.player_pos,
+        ..Default::default()
+    });
+    draw_mesh(model);
+    pop_camera_state();
 }
 
 pub fn draw_cube_from_floor(

@@ -8,6 +8,7 @@ use crate::screen::commands::get_commands;
 use crate::world::World;
 use macroquad::prelude::*;
 use screen::draw;
+use crate::common::AnyError;
 use crate::screen::models::load_models;
 
 const GIT_VERSION: &str = git_version!(args = ["--tags", "--dirty"]);
@@ -16,9 +17,9 @@ const DEFAULT_WINDOW_WIDTH: i32 = 480;
 const DEFAULT_WINDOW_HEIGHT: i32 = 640;
 
 #[macroquad::main(window_conf)]
-async fn main() {
+async fn main() -> Result<(), AnyError> {
     let args = CliArgs::parse();
-    let models = load_models();
+    let models = load_models()?;
     let mut world = World::new(args.level);
     loop {
         let commands = get_commands();
@@ -29,6 +30,7 @@ async fn main() {
         draw::draw(&mut world, &models);
         next_frame().await
     }
+    Ok(())
 }
 
 #[derive(Parser, Debug)]
