@@ -11,6 +11,7 @@ use macroquad::ui::widgets::{Button, Label, Window};
 const FONT_SIZE: f32 = 16.0;
 const PISS_SPEED: f32 = 10.0;
 const PISS_YELLOW: Color = Color::new(0.9, 0.9, 0.0, 1.0);
+const PLAYER_COLOR: Color = Color::new(0.00, 0.47, 0.95, 0.3);
 
 pub struct Drawer {
     piss_particles: VecDeque<Vec3>,
@@ -31,9 +32,9 @@ impl Drawer {
         clear_background(GRAY);
         // draw_grid(20, 1., BLACK, GRAY);
         draw_walls(world);
-        draw_player(world, &models.player);
         draw_obstacles(&world.obstacles, world.previous_frame_ts);
         self.draw_piss_spray(world);
+        draw_player(world, &models.player);
         draw_hud(world);
     }
 
@@ -96,7 +97,7 @@ fn point_to_vertex_no_texture(points: Vec<Vec3>, color: Color) -> Vec<Vertex> {
 }
 
 fn draw_player(world: &World, _model: &Model) {
-    let color = if world.colliding { RED } else { BLUE };
+    let color = if world.colliding { RED } else { PLAYER_COLOR };
     draw_cube_from_floor(
         world.player_pos,
         Vec3::new(1.0, PLAYER_HEIGHT, 1.0),
