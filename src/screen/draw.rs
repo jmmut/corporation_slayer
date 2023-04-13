@@ -69,15 +69,15 @@ fn draw_player(world: &World, model: &Model) {
         None,
         color,
     );
-    push_camera_state();
-    set_camera(&Camera3D {
-        position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0) - world.player_pos,
-        up: vec3(0.0, 1.0, 0.0),
-        target: vec3(2.0 + world.player_pos.x, 0.0, 0.0) - world.player_pos,
-        ..Default::default()
-    });
-    draw_mesh(model);
-    pop_camera_state();
+    // push_camera_state();
+    // set_camera(&Camera3D {
+    //     position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0) - world.player_pos,
+    //     up: vec3(0.0, 1.0, 0.0),
+    //     target: vec3(2.0 + world.player_pos.x, 0.0, 0.0) - world.player_pos,
+    //     ..Default::default()
+    // });
+    // draw_mesh(model);
+    // pop_camera_state();
 }
 
 pub fn draw_cube_from_floor(
