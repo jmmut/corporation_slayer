@@ -7,6 +7,8 @@ use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
 
+const FONT_SIZE: f32 = 16.0;
+
 pub fn draw(world: &mut World, models: &Models) {
     set_camera(&Camera3D {
         position: vec3(-3.0 + world.player_pos.x, 4.0, 0.0),
@@ -106,6 +108,7 @@ pub fn draw_obstacles(obstacles: &Obstacles, ts: TimestampSeconds) {
 fn draw_hud(world: &mut World) {
     set_default_camera();
     draw_health(world);
+    draw_piss(world);
     draw_level_finished(world);
     draw_game_over(world);
 }
@@ -114,6 +117,7 @@ fn draw_health(world: &World) {
     let full_width = screen_width();
     let width = 0.4 * full_width;
     let padding = 0.05 * full_width;
+    let padding_text = 0.035 * full_width;
     draw_rectangle(
         padding,
         padding,
@@ -122,6 +126,29 @@ fn draw_health(world: &World) {
         DARKGREEN,
     );
     draw_rectangle_lines(padding, padding, width, padding * 2.0, 4.0, BLACK);
+    draw_text("HEALTH", padding, padding_text, FONT_SIZE, BLACK);
+}
+
+fn draw_piss(world: &World) {
+    let full_width = screen_width();
+    let width = 0.4 * full_width;
+    let padding = 0.05 * full_width;
+    draw_rectangle(padding + 0.5*full_width, padding, width, padding * 2.0,
+        Color::new(0.4, 0.75, 1.0, 0.3),
+    );
+    draw_rectangle(
+        full_width - padding - width * world.piss,
+        padding,
+        width * world.piss,
+        padding * 2.0,
+        Color::new(0.9, 0.9, 0.0, 1.0),
+        // YELLOW,
+    );
+    draw_rectangle_lines(padding + 0.5*full_width, padding, width, padding * 2.0, 4.0, BLACK);
+    let text = "PISS";
+    let text_length = measure_text(text, None, FONT_SIZE as u16, 1.0);
+    let padding_text = 0.035 * full_width;
+    draw_text(text, full_width - padding - text_length.width, padding_text, FONT_SIZE, BLACK);
 }
 
 fn draw_level_finished(world: &mut World) {
@@ -143,13 +170,9 @@ fn draw_level_finished(world: &mut World) {
                     || is_key_down(KeyCode::Enter)
                     || is_key_down(KeyCode::KpEnter)
                 {
-                    let next_level = world.level + 1;
-                    let current_health = world.health;
-                    let current_start = world.game_start;
-                    *world = World::new(next_level);
-                    world.health = current_health;
-                    world.level = next_level;
-                    world.game_start = current_start;
+                    world.level += 1;
+                    world.piss = 1.0_f32.min(world.piss + 0.1);
+                    world.regenerate();
                 }
             });
     }

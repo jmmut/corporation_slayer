@@ -19,6 +19,7 @@ pub struct World {
     pub previous_frame_ts: TimestampSeconds,
     pub colliding: bool,
     pub health: f32,
+    pub piss: f32,
     pub level: i32,
     pub game_start: TimestampSeconds,
     pub game_end: Option<TimestampSeconds>,
@@ -26,17 +27,20 @@ pub struct World {
 
 impl World {
     pub fn new(level: i32) -> Self {
-        Self {
+        let mut world = Self {
             health: 1.0,
+            piss: 0.3,
             player_pos: Vec3::new(0.0, 0.0, 0.0),
             jump_started: 0.0,
-            obstacles: generate_obstacles(level, get_random_seed()),
+            obstacles: Vec::new(),
             previous_frame_ts: now(),
             colliding: false,
             level,
             game_start: now(),
             game_end: None,
-        }
+        };
+        world.regenerate();
+        world
     }
 
     pub fn update(&mut self, commands: Commands) {
@@ -47,6 +51,12 @@ impl World {
             self.update_health(&commands);
             self.update_time(&commands);
         }
+    }
+
+    pub fn regenerate(&mut self) {
+        self.obstacles = generate_obstacles(self.level, get_random_seed());
+        self.player_pos = Vec3::new(0.0, 0.0, 0.0);
+        self.jump_started = 0.0;
     }
 
     fn update_player_position(&mut self, commands: &Commands) {
