@@ -1,7 +1,12 @@
 use crate::common::TimestampSeconds;
 use macroquad::prelude::*;
 
-pub enum Obstacle {
+pub struct Obstacle {
+    alive: bool,
+    position: Position,
+}
+
+pub enum Position {
     Static {
         pos: Vec3,
     },
@@ -17,21 +22,27 @@ pub type Obstacles = Vec<Obstacle>;
 
 impl Obstacle {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
-        Self::Static {
-            pos: Vec3::new(x, y, z),
+        Self {
+            alive: true,
+            position: Position::Static {
+                pos: Vec3::new(x, y, z),
+            },
         }
     }
     pub fn new_moving(x: f32, y: f32, z: f32, moving_right: bool) -> Self {
-        Self::Moving {
-            initial_pos: Vec3::new(x, y, z),
-            salt: x as f64 % 100.0 * y as f64 % 100.0 + x as f64 + y as f64 + z as f64,
-            moving_right,
+        Self {
+            alive: true,
+            position: Position::Moving {
+                initial_pos: Vec3::new(x, y, z),
+                salt: x as f64 % 100.0 * y as f64 % 100.0 + x as f64 + y as f64 + z as f64,
+                moving_right,
+            },
         }
     }
     pub fn get_pos(&self, ts: TimestampSeconds) -> Vec3 {
-        match self {
-            Obstacle::Static { pos } => *pos,
-            Obstacle::Moving {
+        match &self.position {
+            Position::Static { pos } => *pos,
+            Position::Moving {
                 initial_pos,
                 salt,
                 moving_right,
@@ -53,7 +64,22 @@ impl Obstacle {
         //     Obstacle::Static { .. } => ORANGE,
         // Obstacle::Moving { moving_right, .. } => if *moving_right {ORANGE} else {PURPLE},
         // }
-        ORANGE
+        if self.alive {
+            ORANGE
+        } else {
+            BROWN
+        }
+    }
+    pub fn kill(&mut self, ts: TimestampSeconds) {
+        self.alive = false;
+        if let Position::Moving { .. } = self.position {
+            self.position = Position::Static {
+                pos: self.get_pos(ts),
+            }
+        }
+    }
+    pub fn is_alive(&self) -> bool {
+        self.alive
     }
 }
 

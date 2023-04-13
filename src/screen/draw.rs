@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 use crate::common::TimestampSeconds;
 use crate::screen::models::{Model, Models};
 use crate::world::obstacles::Obstacles;
@@ -9,16 +8,14 @@ use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
 
 const FONT_SIZE: f32 = 16.0;
-const PISS_SPEED: f32 = 10.0;
 const PISS_YELLOW: Color = Color::new(0.9, 0.9, 0.0, 1.0);
 const PLAYER_COLOR: Color = Color::new(0.00, 0.47, 0.95, 0.3);
 
-pub struct Drawer {
-}
+pub struct Drawer {}
 
 impl Drawer {
     pub fn new() -> Self {
-        Self { }
+        Self {}
     }
 
     pub fn draw(&mut self, world: &mut World, models: &Models) {
@@ -39,11 +36,15 @@ impl Drawer {
 
     pub fn draw_piss_spray(&mut self, world: &World) {
         for particle in &world.piss_particles {
-            draw_cube_from_floor(particle.position, Vec3::new(0.1, 0.1, 0.1), None, PISS_YELLOW)
+            draw_cube_from_floor(
+                particle.position,
+                Vec3::new(0.1, 0.1, 0.1),
+                None,
+                PISS_YELLOW,
+            )
         }
     }
 }
-
 
 fn draw_walls(world: &World) {
     let starting_wall = 5.0;
@@ -154,7 +155,11 @@ fn draw_piss(world: &World) {
     let full_width = screen_width();
     let width = 0.4 * full_width;
     let padding = 0.05 * full_width;
-    draw_rectangle(padding + 0.5*full_width, padding, width, padding * 2.0,
+    draw_rectangle(
+        padding + 0.5 * full_width,
+        padding,
+        width,
+        padding * 2.0,
         Color::new(0.4, 0.75, 1.0, 0.3),
     );
     draw_rectangle(
@@ -164,11 +169,24 @@ fn draw_piss(world: &World) {
         padding * 2.0,
         PISS_YELLOW,
     );
-    draw_rectangle_lines(padding + 0.5*full_width, padding, width, padding * 2.0, 4.0, BLACK);
+    draw_rectangle_lines(
+        padding + 0.5 * full_width,
+        padding,
+        width,
+        padding * 2.0,
+        4.0,
+        BLACK,
+    );
     let text = "PISS";
     let text_length = measure_text(text, None, FONT_SIZE as u16, 1.0);
     let padding_text = 0.035 * full_width;
-    draw_text(text, full_width - padding - text_length.width, padding_text, FONT_SIZE, BLACK);
+    draw_text(
+        text,
+        full_width - padding - text_length.width,
+        padding_text,
+        FONT_SIZE,
+        BLACK,
+    );
 }
 
 fn draw_level_finished(world: &mut World) {

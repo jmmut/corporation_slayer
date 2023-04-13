@@ -1,11 +1,11 @@
 pub mod obstacles;
 
-use std::collections::VecDeque;
 use crate::common::TimestampSeconds;
 use crate::screen::commands::{Commands, Movement};
 use crate::world::obstacles::{generate_obstacles, Obstacles};
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
+use std::collections::VecDeque;
 use std::f32::consts::SQRT_2;
 
 const SPEED: f32 = 10.0;
@@ -115,9 +115,11 @@ impl World {
 
     fn update_collision(&mut self) {
         for obstacle in &self.obstacles {
-            if collides(self.player_pos, obstacle.get_pos(self.previous_frame_ts)) {
-                self.colliding = true;
-                return;
+            if obstacle.is_alive() {
+                if collides(self.player_pos, obstacle.get_pos(self.now_ts)) {
+                    self.colliding = true;
+                    return;
+                }
             }
         }
         self.colliding = false;
@@ -145,7 +147,7 @@ impl World {
 
         // reduce piss bar
         if self.pissing {
-            self.piss = 0.0_f32.max(self.piss - 0.01);
+            self.piss = 0.0_f32.max(self.piss - 0.002);
         }
 
         // add piss particle
@@ -162,15 +164,21 @@ impl World {
             let jump_time = commands.ts_now - particle.started;
             let jumping = jump_time < JUMP_DURATION;
             if jumping {
-                let height:f64 = 1.5;
+                let height: f64 = 1.5;
                 let offset = JUMP_DURATION * 0.5;
-                // let jump_speed = (height/offset).sqrt();
                 let jump_speed = 1.0;
                 let height_coef = height / (offset * offset);
                 let x = jump_time * jump_speed - offset;
                 let y = height_coef * x * x;
                 particle.position.y = (height - y) as f32;
                 particle.position.x += (jump_time * jump_speed) as f32;
+
+                for obstacle in &mut self.obstacles {
+                    if collides(particle.position, obstacle.get_pos(self.now_ts)) {
+                        obstacle.kill(self.now_ts);
+                        break;
+                    }
+                }
             } else {
                 particles_to_remove += 1;
             }

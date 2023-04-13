@@ -1,5 +1,5 @@
 use crate::common::AnyError;
-use gltf::{Semantic};
+use gltf::Semantic;
 use macroquad::models::Vertex;
 use macroquad::prelude::{Mesh, Vec2, Vec3, BLACK};
 use std::iter::Map;
