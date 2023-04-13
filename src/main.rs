@@ -2,14 +2,14 @@ mod common;
 mod screen;
 mod world;
 
+use crate::common::AnyError;
+use crate::screen::commands::get_commands;
+use crate::screen::models::load_models;
+use crate::world::World;
 use clap::Parser;
 use git_version::git_version;
-use crate::screen::commands::get_commands;
-use crate::world::World;
 use macroquad::prelude::*;
 use screen::draw;
-use crate::common::AnyError;
-use crate::screen::models::load_models;
 
 const GIT_VERSION: &str = git_version!(args = ["--tags", "--dirty"]);
 const DEFAULT_WINDOW_TITLE: &'static str = "Corporation slayer";

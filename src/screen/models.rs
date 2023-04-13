@@ -1,9 +1,9 @@
-use std::iter::Map;
-use gltf::{buffer, Document, Gltf, image, Semantic};
-use gltf::buffer::Data;
-use macroquad::prelude::{BLACK, Mesh, Vec2, Vec3};
-use macroquad::models::Vertex;
 use crate::common::AnyError;
+use gltf::buffer::Data;
+use gltf::{buffer, image, Document, Gltf, Semantic};
+use macroquad::models::Vertex;
+use macroquad::prelude::{Mesh, Vec2, Vec3, BLACK};
+use std::iter::Map;
 
 pub struct Models {
     pub player: Model,
@@ -14,9 +14,13 @@ pub type Model = Mesh;
 pub fn load_models() -> Result<Models, AnyError> {
     let path = "assets/models/cube_test.glb";
     let mut meshes = gltf_to_meshes(path)?;
-    assert!(meshes.len() >= 1, "expected 1 or more meshes loaded from {}", path);
+    assert!(
+        meshes.len() >= 1,
+        "expected 1 or more meshes loaded from {}",
+        path
+    );
     Ok(Models {
-        player: meshes.remove(0)
+        player: meshes.remove(0),
     })
 }
 
@@ -28,7 +32,10 @@ fn gltf_to_meshes(path: &str) -> Result<Vec<Mesh>, AnyError> {
             let reader = primitive.reader(|buffer| Some(&buffers[buffer.index()]));
 
             if let Some(accessor) = primitive.get(&Semantic::Positions) {
-                let positions: Vec<[f32; 3]> = reader.read_positions().expect("Position primitives should be present").collect();
+                let positions: Vec<[f32; 3]> = reader
+                    .read_positions()
+                    .expect("Position primitives should be present")
+                    .collect();
                 let vertices = positions
                     .iter()
                     // .zip(normals.iter())
@@ -41,7 +48,9 @@ fn gltf_to_meshes(path: &str) -> Result<Vec<Mesh>, AnyError> {
                     })
                     .collect::<Vec<_>>();
 
-                let nested_iterator: Option<Map<_,_>> = reader.read_indices().map(|indices| indices.into_u32().map(|i| i as u16));
+                let nested_iterator: Option<Map<_, _>> = reader
+                    .read_indices()
+                    .map(|indices| indices.into_u32().map(|i| i as u16));
                 let indices = nested_iterator.expect("").collect::<Vec<_>>();
                 let mesh = Mesh {
                     vertices,

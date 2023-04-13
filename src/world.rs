@@ -2,10 +2,10 @@ pub mod obstacles;
 
 use crate::common::TimestampSeconds;
 use crate::screen::commands::{Commands, Movement};
+use crate::world::obstacles::{generate_obstacles, Obstacles};
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
 use std::f32::consts::SQRT_2;
-use crate::world::obstacles::{generate_obstacles, Obstacles};
 
 const SPEED: f32 = 10.0;
 const TUNNEL_HALF_WIDTH: f32 = 1.5;

@@ -1,9 +1,15 @@
-use macroquad::prelude::*;
 use crate::common::TimestampSeconds;
+use macroquad::prelude::*;
 
 pub enum Obstacle {
-    Static{pos:Vec3},
-    Moving{initial_pos: Vec3, salt: f64, moving_right: bool},
+    Static {
+        pos: Vec3,
+    },
+    Moving {
+        initial_pos: Vec3,
+        salt: f64,
+        moving_right: bool,
+    },
 }
 
 // might want to make a VecDeque to queue obstacles dynamically
@@ -25,28 +31,31 @@ impl Obstacle {
     pub fn get_pos(&self, ts: TimestampSeconds) -> Vec3 {
         match self {
             Obstacle::Static { pos } => *pos,
-            Obstacle::Moving { initial_pos, salt, moving_right } => {
+            Obstacle::Moving {
+                initial_pos,
+                salt,
+                moving_right,
+            } => {
                 let path_length = 6.0;
                 let obstacle_speed = 3.0;
-                let offset = ((ts * obstacle_speed + *salt) % path_length ) as f32;
+                let offset = ((ts * obstacle_speed + *salt) % path_length) as f32;
                 let z = if *moving_right {
                     initial_pos.z + offset
                 } else {
                     initial_pos.z + path_length as f32 - offset
                 };
                 Vec3::new(initial_pos.x, initial_pos.y, z)
-            },
+            }
         }
     }
     pub fn get_color(&self) -> Color {
         // match self {
         //     Obstacle::Static { .. } => ORANGE,
-            // Obstacle::Moving { moving_right, .. } => if *moving_right {ORANGE} else {PURPLE},
+        // Obstacle::Moving { moving_right, .. } => if *moving_right {ORANGE} else {PURPLE},
         // }
         ORANGE
     }
 }
-
 
 pub fn generate_obstacles(level: i32, seed: u64) -> Vec<Obstacle> {
     let num_obstacles = 15 + level;
@@ -55,7 +64,7 @@ pub fn generate_obstacles(level: i32, seed: u64) -> Vec<Obstacle> {
     let mut depth = 3.0;
     rand::srand(seed);
     loop {
-        let moving_obstacle_chance = (0 + level*2).min(90);
+        let moving_obstacle_chance = (0 + level * 2).min(90);
         if percentage_chance(moving_obstacle_chance) {
             obstacles.push(Obstacle::new_moving(depth, 0.0, -3.0, coin_flip()));
             if obstacles.len() == num_obstacles as usize {

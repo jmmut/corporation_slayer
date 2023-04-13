@@ -1,12 +1,12 @@
-use gltf::{Gltf, Primitive};
+use crate::common::TimestampSeconds;
+use crate::screen::models::{Model, Models};
+use crate::world::obstacles::Obstacles;
 use crate::world::{World, PLAYER_HEIGHT};
+use gltf::{Gltf, Primitive};
 use macroquad::models::Vertex;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
-use crate::common::TimestampSeconds;
-use crate::screen::models::{Model, Models};
-use crate::world::obstacles::Obstacles;
 
 pub fn draw(world: &mut World, models: &Models) {
     set_camera(&Camera3D {
@@ -25,7 +25,14 @@ pub fn draw(world: &mut World, models: &Models) {
 
 fn draw_walls(world: &World) {
     let starting_wall = 5.0;
-    let end_x = world.obstacles.last().unwrap().get_pos(world.previous_frame_ts).x + 10.0 + starting_wall;
+    let end_x = world
+        .obstacles
+        .last()
+        .unwrap()
+        .get_pos(world.previous_frame_ts)
+        .x
+        + 10.0
+        + starting_wall;
     let v0 = Vec3::new(-5.0, 6.0, -2.0);
     let v0v1 = Vec3::new(0.0, -6.0, 0.0);
     let v0v3 = Vec3::new(end_x, 0.0, 0.0);
@@ -119,7 +126,13 @@ fn draw_health(world: &World) {
 }
 
 fn draw_level_finished(world: &mut World) {
-    let end_x = world.obstacles.last().unwrap().get_pos(world.previous_frame_ts).x + 10.0;
+    let end_x = world
+        .obstacles
+        .last()
+        .unwrap()
+        .get_pos(world.previous_frame_ts)
+        .x
+        + 10.0;
     if world.player_pos.x > end_x {
         let w = screen_width();
         let h = screen_height();
