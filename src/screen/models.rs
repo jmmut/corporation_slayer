@@ -8,18 +8,18 @@ pub struct Models {
     pub player: Model,
 }
 
-pub type Model = Mesh;
+pub type Model = Option<Mesh>;
 
 pub fn load_models() -> Result<Models, AnyError> {
     let path = "assets/models/cube_test.glb";
     let mut meshes = gltf_to_meshes(path)?;
-    assert!(
-        meshes.len() >= 1,
-        "expected 1 or more meshes loaded from {}",
-        path
-    );
+    // assert!(
+    //     meshes.len() >= 1,
+    //     "expected 1 or more meshes loaded from {}",
+    //     path
+    // );
     Ok(Models {
-        player: meshes.remove(0),
+        player: None,
     })
 }
 

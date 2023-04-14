@@ -147,7 +147,7 @@ impl World {
 
         // reduce piss bar
         if self.pissing {
-            self.piss = 0.0_f32.max(self.piss - 0.002);
+            self.piss = 0.0_f32.max(self.piss - 0.005);
         }
 
         // add piss particle
