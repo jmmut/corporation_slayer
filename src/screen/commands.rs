@@ -19,10 +19,11 @@ pub enum Movement {
 }
 
 pub fn get_commands() -> Commands {
+    let (forward_movement, left_movement) = get_forward_and_left_movement();
     Commands {
         should_quit: is_key_pressed(KeyCode::Escape),
-        forward_movement: get_forward_movement(),
-        left_movement: get_side_movement(),
+        forward_movement,
+        left_movement,
         jump: get_jump(),
         ts_now: now(),
         pissing: get_pissing(),
@@ -36,7 +37,11 @@ fn get_pissing() -> bool {
     is_key_down(KeyCode::Enter) || gui::piss_button::is_clicked()
 }
 
-fn get_side_movement() -> Movement {
+fn get_forward_and_left_movement() -> (Movement, Movement) {
+    (get_forward_movement(), get_left_movement())
+}
+
+fn get_left_movement() -> Movement {
     get_cancellable_movement(
         is_key_down(KeyCode::Left) || is_key_down(KeyCode::A),
         is_key_down(KeyCode::Right) || is_key_down(KeyCode::D),
