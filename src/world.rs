@@ -8,9 +8,10 @@ use macroquad::prelude::*;
 use std::collections::VecDeque;
 use std::f32::consts::SQRT_2;
 
-const SPEED: f32 = 10.0;
+const SPEED: f32 = 5.0;
 const TUNNEL_HALF_WIDTH: f32 = 1.5;
-const JUMP_DURATION: f64 = 0.3;
+const JUMP_DURATION: f64 = 0.7;
+const PISS_DURATION: f64 = 0.3;
 pub const PLAYER_HEIGHT: f32 = 1.75;
 
 pub struct World {
@@ -162,10 +163,10 @@ impl World {
         let mut particles_to_remove = 0;
         for particle in &mut self.piss_particles {
             let jump_time = commands.ts_now - particle.started;
-            let jumping = jump_time < JUMP_DURATION;
+            let jumping = jump_time < PISS_DURATION;
             if jumping {
                 let height: f64 = 1.5;
-                let offset = JUMP_DURATION * 0.5;
+                let offset = PISS_DURATION * 0.5;
                 let jump_speed = 1.0;
                 let height_coef = height / (offset * offset);
                 let x = jump_time * jump_speed - offset;
