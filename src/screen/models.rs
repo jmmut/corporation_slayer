@@ -1,8 +1,9 @@
 use crate::common::AnyError;
-use gltf::Semantic;
-use macroquad::models::Vertex;
-use macroquad::prelude::{Mesh, Vec2, Vec3, BLACK};
-use std::iter::Map;
+// use gltf::Semantic;
+// use macroquad::models::Vertex;
+use macroquad::prelude::Mesh;
+// use macroquad::prelude::{Vec2, Vec3, BLACK};
+// use std::iter::Map;
 
 pub struct Models {
     pub player: Model,
@@ -12,7 +13,7 @@ pub type Model = Option<Mesh>;
 
 pub fn load_models() -> Result<Models, AnyError> {
     let path = "assets/models/cube_test.glb";
-    let mut meshes = gltf_to_meshes(path)?;
+    let mut _meshes = gltf_to_meshes(path)?;
     // assert!(
     //     meshes.len() >= 1,
     //     "expected 1 or more meshes loaded from {}",
@@ -21,7 +22,7 @@ pub fn load_models() -> Result<Models, AnyError> {
     Ok(Models { player: None })
 }
 
-fn gltf_to_meshes(path: &str) -> Result<Vec<Mesh>, AnyError> {
+fn gltf_to_meshes(_path: &str) -> Result<Vec<Mesh>, AnyError> {
     return Ok(Vec::new());
     // let (document, buffers, _images) = gltf::import(path)?;
     // let mut meshes = Vec::<Mesh>::new();

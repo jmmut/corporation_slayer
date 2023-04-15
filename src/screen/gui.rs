@@ -1,5 +1,8 @@
 use crate::screen::draw::FONT_SIZE;
-use macroquad::prelude::{draw_rectangle, draw_text, measure_text, mouse_position_local, touches_local, Color, BLACK, draw_circle};
+use macroquad::prelude::{
+    draw_circle, draw_rectangle, draw_text, measure_text, mouse_position_local, touches_local,
+    Color, BLACK,
+};
 use macroquad::prelude::{is_mouse_button_down, screen_height, screen_width, MouseButton, Vec2};
 
 const PRESSED_BUTTON_COLOR: Color = Color::new(0.1, 0.1, 0.1, 0.3);
@@ -59,7 +62,21 @@ pub mod move_button {
     pub fn get_movement() -> Option<Vec2> {
         let clicked = clicked_or_touched_pos(inside_button);
         unsafe { LAST_IS_CLICKED = clicked.is_some() };
-        return clicked;
+        return clicked.map(|screen_pos| {
+            let (x, y, radius) = get_circle_button_pos();
+            let x_local = x / screen_width() * 2.0 - 1.0;
+            let y_local = y / screen_height() * 2.0 - 1.0;
+            let radius_local = radius / screen_width().min(screen_height());
+            let x_local_button = (x_local - screen_pos.x) / radius_local;
+            let y_local_button = (y_local - screen_pos.y) / radius_local;
+            // these calculations are wrong for some unknown reason
+            // (coordinates reach 1 before the border of the button)
+            // but this is actually better, it gives a wide range with the max value
+            Vec2::new(
+                x_local_button.clamp(-1.0, 1.0),
+                y_local_button.clamp(-1.0, 1.0),
+            )
+        });
     }
 
     fn inside_button(position: Vec2) -> bool {
@@ -116,12 +133,7 @@ pub fn draw_button(text: &str, position: Vec2, button_is_clicked: bool) {
 
 /// position is in the range of {x: [0, 1], y: [0, 1]}
 pub fn draw_circle_button(text: &str, button_is_clicked: bool) {
-    let screen_h = screen_height();
-    let screen_w = screen_width();
-    let padding = (0.05 * screen_w).min(0.05 * screen_h);
-    let radius = (0.4 * screen_w).min(0.4 * screen_h) * 0.5;
-    let x = padding + radius; // to the left as much as possible on window resize
-    let y = screen_h - (padding + radius); // to the bottom as much as possible on window resize
+    let (x, y, radius) = get_circle_button_pos();
     let color = if button_is_clicked {
         PRESSED_BUTTON_COLOR
     } else {
@@ -132,8 +144,18 @@ pub fn draw_circle_button(text: &str, button_is_clicked: bool) {
     draw_text(
         text,
         x - size.width * 0.5,
-        y + size.height *0.5,
+        y + size.height * 0.5,
         FONT_SIZE,
         BLACK,
     );
+}
+
+fn get_circle_button_pos() -> (f32, f32, f32) {
+    let screen_h = screen_height();
+    let screen_w = screen_width();
+    let padding = (0.05 * screen_w).min(0.05 * screen_h);
+    let radius = (0.4 * screen_w).min(0.4 * screen_h) * 0.5;
+    let x = padding + radius; // to the left as much as possible on window resize
+    let y = screen_h - (padding + radius); // to the bottom as much as possible on window resize
+    (x, y, radius)
 }
