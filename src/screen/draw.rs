@@ -1,4 +1,5 @@
 use crate::common::TimestampSeconds;
+use crate::screen::gui::draw_gui;
 use crate::screen::models::{Model, Models};
 use crate::world::obstacles::Obstacles;
 use crate::world::{World, PLAYER_HEIGHT};
@@ -7,7 +8,7 @@ use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::{Button, Label, Window};
 
-const FONT_SIZE: f32 = 16.0;
+pub const FONT_SIZE: f32 = 16.0;
 const PISS_YELLOW: Color = Color::new(0.9, 0.9, 0.0, 1.0);
 const PLAYER_COLOR: Color = Color::new(0.00, 0.47, 0.95, 0.3);
 
@@ -32,6 +33,7 @@ impl Drawer {
         self.draw_piss_spray(world);
         draw_player(world, &models.player);
         draw_hud(world);
+        draw_gui();
     }
 
     pub fn draw_piss_spray(&mut self, world: &World) {

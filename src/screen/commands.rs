@@ -1,4 +1,5 @@
 use crate::common::TimestampSeconds;
+use crate::screen::gui;
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
 
@@ -29,7 +30,7 @@ pub fn get_commands() -> Commands {
 }
 
 fn get_jump() -> bool {
-    is_key_pressed(KeyCode::Space)
+    is_key_pressed(KeyCode::Space) || gui::jump_button::is_clicked()
 }
 fn get_pissing() -> bool {
     is_key_down(KeyCode::Enter)

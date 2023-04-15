@@ -18,9 +18,7 @@ pub fn load_models() -> Result<Models, AnyError> {
     //     "expected 1 or more meshes loaded from {}",
     //     path
     // );
-    Ok(Models {
-        player: None,
-    })
+    Ok(Models { player: None })
 }
 
 fn gltf_to_meshes(path: &str) -> Result<Vec<Mesh>, AnyError> {
