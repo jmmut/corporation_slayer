@@ -33,7 +33,7 @@ fn get_jump() -> bool {
     is_key_pressed(KeyCode::Space) || gui::jump_button::is_clicked()
 }
 fn get_pissing() -> bool {
-    is_key_down(KeyCode::Enter)
+    is_key_down(KeyCode::Enter) || gui::piss_button::is_clicked()
 }
 
 fn get_side_movement() -> Movement {
